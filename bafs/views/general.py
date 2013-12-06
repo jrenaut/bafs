@@ -15,7 +15,7 @@ from dateutil import rrule, parser
 
 from bafs import app, db
 from bafs.utils import gviz_api
-from bafs.model import Team
+from bafs.model import Team, Athlete
 
 blueprint = Blueprint('general', __name__)
 
@@ -63,3 +63,13 @@ def indiv_elev_dist():
 @blueprint.route("/explore/riders_by_lowtemp")
 def riders_by_lowtemp():
     return render_template('explore/riders_by_lowtemp.html')
+
+@blueprint.route("/people")
+def list_users():
+	users_list = db.session.query(Athlete).order_by(Athlete.name)
+	return render_template('people/list.html', users=users_list)
+@blueprint.route("/people/<user_id>")
+def show_user(user_id):
+	our_user = db.session.query(Athlete).filter_by(id=user_id).first()
+	our_team = db.session.query(Team).filter_by(id=our_user.team_id).first()
+	return render_template('people/show.html', user=our_user, team=our_team)
